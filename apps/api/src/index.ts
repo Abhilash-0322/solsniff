@@ -167,7 +167,10 @@ app.post('/api/analyze', async (_req, res) => {
 // ===== Database Persistence =====
 
 async function saveToDatabase(result: AnalysisPipelineResult) {
-    console.log('💾 Saving analysis results to database...');
+    console.log(`\n💾 SAVING TO DATABASE...`);
+    console.log(`   URL: ${process.env.DATABASE_URL || 'NOT SET'}`);
+    console.log(`   Config URL: ${appConfig.database.url}`);
+
     try {
         // 1. Create AnalysisReport
         const report = await prisma.analysisReport.create({
