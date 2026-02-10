@@ -1,0 +1,61 @@
+name: Deploy API to Azure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'turbo.json'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Generate Prisma Client
+      run: npm run db:generate
+      
+    - name: Build all packages
+      run: npm run build
+      
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy
+        # Copy necessary files
+        cp -r apps deploy/
+        cp -r packages deploy/
+        cp -r node_modules deploy/
+        cp package.json deploy/
+        cp turbo.json deploy/
+        cp tsconfig.base.json deploy/
+        # Create archive
+        cd deploy
+        zip -r ../deploy.zip . -q
+        cd ..
+        
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'solsniff-api-v1'
+        publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
+        package: ./deploy.zip
