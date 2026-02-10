@@ -9,6 +9,7 @@
     "packages/*"
   ],
   "scripts": {
+    "start": "cd apps/api && node dist/index.js",
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
