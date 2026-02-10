@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Signal {
+  id          String   @id @default(cuid())
+  source      String   // onchain, github, social, news, report
+  title       String
+  description String
+  url         String?
+  strength    String   // weak, moderate, strong, very_strong
+  score       Int      @default(0)
+  metadata    String   @default("{}") // JSON string
+  detectedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  
+  narrativeId String?
+  narrative   Narrative? @relation(fields: [narrativeId], references: [id])
+  
+  @@index([source])
+  @@index([detectedAt])
+  @@index([narrativeId])
+}
+
+model Narrative {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  description     String
+  explanation     String
+  status          String   @default("emerging") // emerging, accelerating, established, fading
+  confidenceScore Int      @default(50)
+  trendDirection  String   @default("up") // up, down, stable
+  tags            String   @default("[]") // JSON array string
+  detectedAt      DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  fortnightPeriod String
+  
+  signals  Signal[]
+  ideas    BuildIdea[]
+  reportId String?
+  report   AnalysisReport? @relation(fields: [reportId], references: [id])
+  
+  @@index([status])
+  @@index([fortnightPeriod])
+}
+
+model BuildIdea {
+  id                    String   @id @default(cuid())
+  title                 String
+  slug                  String   @unique
+  description           String
+  problem               String
+  solution              String
+  targetAudience        String
+  feasibility           String   @default("medium") // low, medium, high
+  category              String   // defi, nft, infrastructure, etc.
+  technicalRequirements String   @default("[]") // JSON array
+  potentialChallenges   String   @default("[]") // JSON array
+  score                 Int      @default(50)
+  createdAt             DateTime @default(now())
+  
+  narrativeId String
+  narrative   Narrative @relation(fields: [narrativeId], references: [id])
+  
+  @@index([category])
+  @@index([narrativeId])
+}
+
+model AnalysisReport {
+  id          String   @id @default(cuid())
+  period      String   @unique
+  startDate   DateTime
+  endDate     DateTime
+  summary     String   @default("")
+  totalSignals Int     @default(0)
+  signalBreakdown String @default("{}") // JSON
+  avgStrength Float      @default(0)
+  generatedAt DateTime @default(now())
+  
+  narratives Narrative[]
+  
+  @@index([period])
+}
+
+model DataSnapshot {
+  id        String   @id @default(cuid())
+  source    String
+  data      String   // JSON string
+  createdAt DateTime @default(now())
+  
+  @@index([source])
+  @@index([createdAt])
+}

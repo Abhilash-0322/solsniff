@@ -1,0 +1,26 @@
+{
+  "name": "solsniff",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Solana Narrative Detection & Idea Generation Tool",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "db:generate": "npm run generate --workspace=@solsniff/database",
+    "db:push": "npm run push --workspace=@solsniff/database",
+    "db:seed": "npm run seed --workspace=@solsniff/database"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

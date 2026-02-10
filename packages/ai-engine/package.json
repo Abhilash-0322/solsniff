@@ -1,0 +1,19 @@
+{
+    "name": "@solsniff/ai-engine",
+    "version": "1.0.0",
+    "private": true,
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "build": "tsc",
+        "type-check": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@solsniff/shared-types": "*",
+        "@solsniff/config": "*",
+        "groq-sdk": "^0.8.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3"
+    }
+}
